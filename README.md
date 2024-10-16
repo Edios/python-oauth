@@ -27,6 +27,14 @@
     - Possible Errors: Invalid Credentials
   - [ ] Get user info - Authorization test endpoint
     - localhost/login&auth_token=
+    - response (json): 
+
+    - ```
+      {
+        "authorized_user": ,
+        "content": ,
+      }
+      ```
     - MVP: Pass token in &access_token, but it should be POST and given in header as bearer
     - Possible Errors: Invalid Token, Expired token
 - [ ] Mongo DB implemented in backend

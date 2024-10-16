@@ -2,9 +2,9 @@ class AuthenticationFailed(Exception):
     pass
 
 
-class InvalidAccessToken(Exception):
+class InvalidToken(Exception):
     pass
 
 
-class ClientTokenExpired(Exception):
+class AccessTokenExpired(Exception):
     pass
