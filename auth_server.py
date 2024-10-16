@@ -4,7 +4,7 @@ import string
 from dataclasses import dataclass, field
 from typing import List, Tuple, Union
 
-from custom_exceptions import AuthenticationFailed, InvalidAccessToken, AccessTokenExpired
+from custom_exceptions import AuthenticationFailed, InvalidToken, AccessTokenExpired
 
 
 @dataclass
@@ -29,7 +29,7 @@ class Session:
     creation_time: datetime = field(init=False)
 
     def __post_init__(self):
-        self.creation_time = datetime.datetime.now()
+        self.creation_time = self.get_timestamp()
 
     def is_expired(self) -> bool:
         expiration_time = self.creation_time + datetime.timedelta(seconds=self.time_to_leave)
@@ -37,6 +37,10 @@ class Session:
 
     def is_active(self) -> bool:
         return not self.is_expired()
+
+    @staticmethod
+    def get_timestamp():
+        return datetime.datetime.now()
 
 
 class AuthServer:
@@ -62,9 +66,10 @@ class AuthServer:
         ALLOWED_CLIENT_DATA = [Client("admin", "admin2")]
         return client_data in ALLOWED_CLIENT_DATA
 
-    def get_session_data_by_access_token(self, access_token) -> Union[Session, None]:
+    def get_session_data_by_token(self, token_type, token_value) -> Union[Session, None]:
         for session in self.authorized_sessions:
-            if session.tokens.access_token == access_token:
+            token = session.tokens
+            if getattr(token, token_type) == token_value:
                 return session
         return None
 
@@ -74,9 +79,22 @@ class AuthServer:
 
     def is_access_token_valid(self, access_token) -> bool:
 
-        client_session = self.get_session_data_by_access_token(access_token)
+        client_session = self.get_session_data_by_token("access_token", access_token)
         return bool(client_session)
 
     def is_access_token_expired(self, access_token):
-        session = self.get_session_data_by_access_token(access_token)
+        session = self.get_session_data_by_token("access_token", access_token)
         return session.is_expired()
+
+    def refresh_token(self, refresh_token) -> str:
+        """
+        Create new access token and refresh timestamp for session based on given refresh token.
+        :param refresh_token: Given token in pair with access token.
+        :return: New access token
+        """
+        session = self.get_session_data_by_token("refresh_token", refresh_token)
+        if not session:
+            raise InvalidToken("Unable to find refresh token in authorized sessions")
+        session.tokens.access_token = self.generate_random_token(45)
+        session.time_to_leave = session.get_timestamp()
+        return session.tokens.access_token

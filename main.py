@@ -2,7 +2,7 @@
 import argparse
 
 from auth_server import Client, AuthServer
-from custom_exceptions import InvalidAccessToken, AccessTokenExpired
+from custom_exceptions import InvalidToken, AccessTokenExpired
 
 
 def main(user, password):
@@ -10,11 +10,12 @@ def main(user, password):
     auth_server = AuthServer()
     access_token, refresh_token = auth_server.request_token(client)
 
-
     if not auth_server.is_access_token_valid(access_token):
-        raise InvalidAccessToken("Access token not found in authorized token list")
+        raise InvalidToken("Access token not found in authorized token list")
     if auth_server.is_access_token_expired(access_token):
         raise AccessTokenExpired("Access token expired. Use refresh token to renew it.")
+
+    access_token = auth_server.refresh_token(refresh_token)
 
 
 if __name__ == '__main__':

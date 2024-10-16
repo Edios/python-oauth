@@ -2,7 +2,7 @@ class AuthenticationFailed(Exception):
     pass
 
 
-class InvalidAccessToken(Exception):
+class InvalidToken(Exception):
     pass
 
 
