@@ -6,5 +6,5 @@ class InvalidAccessToken(Exception):
     pass
 
 
-class ClientTokenExpired(Exception):
+class AccessTokenExpired(Exception):
     pass

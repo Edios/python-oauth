@@ -4,7 +4,7 @@ import string
 from dataclasses import dataclass, field
 from typing import List, Tuple, Union
 
-from custom_exceptions import AuthenticationFailed, InvalidAccessToken, ClientTokenExpired
+from custom_exceptions import AuthenticationFailed, InvalidAccessToken, AccessTokenExpired
 
 
 @dataclass
@@ -15,7 +15,7 @@ class Client:
 
 @dataclass
 class Token:
-    auth_token: str
+    access_token: str
     refresh_token: str
     # TODO: Implement cancel token
     cancel_token: str = None
@@ -50,11 +50,11 @@ class AuthServer:
             raise AuthenticationFailed("Wrong username or password")
         auth_token = self.generate_random_token(45)
         refresh_token = self.generate_random_token(45)
-        client_tokens = Token(auth_token=auth_token, refresh_token=refresh_token)
+        client_tokens = Token(access_token=auth_token, refresh_token=refresh_token)
         session = Session(client_data, client_tokens)
         self.authorized_sessions.append(session)
         # TODO: Implement separate method for refresh token gathering
-        return client_tokens.auth_token, client_tokens.refresh_token
+        return client_tokens.access_token, client_tokens.refresh_token
 
     @staticmethod
     def check_if_correct_user_data(client_data) -> bool:
@@ -62,23 +62,21 @@ class AuthServer:
         ALLOWED_CLIENT_DATA = [Client("admin", "admin2")]
         return client_data in ALLOWED_CLIENT_DATA
 
+    def get_session_data_by_access_token(self, access_token) -> Union[Session, None]:
+        for session in self.authorized_sessions:
+            if session.tokens.access_token == access_token:
+                return session
+        return None
+
     @staticmethod
     def generate_random_token(token_lenght) -> str:
         return ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(token_lenght))
 
-    def is_auth_token_valid(self, access_token) -> bool:
+    def is_access_token_valid(self, access_token) -> bool:
 
-        def get_session_data() -> Union[Session, None]:
-            for session in self.authorized_sessions:
-                if session.tokens.auth_token == access_token:
-                    return session
-            return None
+        client_session = self.get_session_data_by_access_token(access_token)
+        return bool(client_session)
 
-        client_session = get_session_data()
-        #TODO: Qualify it as separated
-        # if not client_session:
-        #     raise InvalidAccessToken("Access token not found in authorized token list")
-        # if client_session.is_expired():
-        #     raise ClientTokenExpired("Access token expired. Use refresh token to renew it.")
-
-        return client_session and client_session.is_expired()
+    def is_access_token_expired(self, access_token):
+        session = self.get_session_data_by_access_token(access_token)
+        return session.is_expired()
