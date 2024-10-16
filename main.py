@@ -8,14 +8,9 @@ from custom_exceptions import InvalidAccessToken, AccessTokenExpired
 def main(user, password):
     client = Client(user, password)
     auth_server = AuthServer()
-    # TODO: Add exchanging client data for code
-
-    # TODO: Use code to get access token
-    # TODO: Separated endpoint for fetching refresh token
     access_token, refresh_token = auth_server.request_token(client)
 
 
-    auth_server.is_access_token_expired(access_token)
     if not auth_server.is_access_token_valid(access_token):
         raise InvalidAccessToken("Access token not found in authorized token list")
     if auth_server.is_access_token_expired(access_token):
