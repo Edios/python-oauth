@@ -15,7 +15,7 @@ def main(user, password):
     # Content server should ask for this
     auth_server.is_auth_token_valid(access_token)
 
-    print()
+    #print()
 
 
 if __name__ == '__main__':
