@@ -48,8 +48,8 @@ class AuthServer:
     def request_token(self, client_data: Client) -> Tuple[str, str]:
         if not self.check_if_correct_user_data(client_data):
             raise AuthenticationFailed("Wrong username or password")
-        auth_token = self.generate_random_token()
-        refresh_token = self.generate_random_token()
+        auth_token = self.generate_random_token(45)
+        refresh_token = self.generate_random_token(45)
         client_tokens = Token(auth_token=auth_token, refresh_token=refresh_token)
         session = Session(client_data, client_tokens)
         self.authorized_sessions.append(session)
@@ -58,13 +58,13 @@ class AuthServer:
 
     @staticmethod
     def check_if_correct_user_data(client_data) -> bool:
-        # ALLOWED_CLIENT_DATA it's mock for DB records
+        # TODO: ALLOWED_CLIENT_DATA it's mock for DB records
         ALLOWED_CLIENT_DATA = [Client("admin", "admin2")]
         return client_data in ALLOWED_CLIENT_DATA
 
     @staticmethod
-    def generate_random_token() -> str:
-        return ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(45))
+    def generate_random_token(token_lenght) -> str:
+        return ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(token_lenght))
 
     def is_auth_token_valid(self, access_token) -> bool:
 
