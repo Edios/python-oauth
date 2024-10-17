@@ -49,7 +49,7 @@ class AuthServer:
     def __init__(self):
         self.authorized_sessions = []
 
-    def request_token(self, client_data: Client) -> Tuple[str, str]:
+    def fetch_token(self, client_data: Client) -> Tuple[str, str]:
         if not self.check_if_correct_user_data(client_data):
             raise AuthenticationFailed("Wrong username or password")
         auth_token = self.generate_random_token(45)
