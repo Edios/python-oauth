@@ -12,7 +12,14 @@ class DataServer:
     def __init__(self, auth_server):
         self.auth_server = auth_server
 
-    def get_user_info(self, access_token) -> Tuple[str,str]:
+    def get_server_data(self, user) -> str:
+        server_data = {
+            "admin": "Silence is golden",
+            "admin2": "Super secret user data",
+        }
+        return server_data.get(user)
+
+    def get_user_info(self, access_token) -> Tuple[str, str]:
         """
         Returns user-specific information if the user is authorized via a valid access token.
         :param access_token: Access token to verify the user
@@ -23,9 +30,10 @@ class DataServer:
 
         if self.auth_server.is_access_token_expired(access_token):
             raise AccessTokenExpired("Access token expired. Please refresh the token.")
-
+        # This should be an external endpoint with trimmed out sensitive data
         session = self.auth_server.get_session_data_by_token('access_token', access_token)
-        return f"User data for {session.client.user}."
+        user_data=self.get_server_data(session.client.user)
+        return session.client.user, user_data
 
 
 def main(user, password):
@@ -62,7 +70,6 @@ def main(user, password):
         print(f"Authorization failed: {e}")
     except AccessTokenExpired as e:
         print(f"Token expired: {e}")
-
 
 
 if __name__ == '__main__':
