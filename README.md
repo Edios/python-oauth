@@ -1,4 +1,5 @@
 ## Implementation of authentication server backend based on oAuth protocol (simplified)
+### API Documentation with examples: [ Postman Documentation ](https://documenter.getpostman.com/view/19890048/2sAY545Hwm)
 - [x] Auth Server Backend (MVP)
   - [x] Session management
   - [x] Access / Refresh token generation
@@ -6,10 +7,11 @@
 - [x] Data Server Backend (MVP)
   - [x] Make it use Auth server as identity provider
   - [x] Mock up "user data" and enable to fetch it via auth token
-- [ ] Flask endpoints
+- [x] Flask endpoints
   - *This implementation skips requesting for short-living code* 
-  - [ ] Fetch tokens /fetch_token
-    - example: ```localhost/fetch_token&user=admin&password=admin (returns: token, refresh token)```
+  - [x] Fetch tokens /fetch_token
+    - example: ```localhost/fetch_token```
+    - 
     - response (json): 
      ```
     {
@@ -19,10 +21,10 @@
       "token_type": "bearer"
     }
     ```
-    - MVP: Pass credentials in &user and &password, but it should be POST and given in header as basic auth
+    - Pass credentials in header as basic auth
     - Possible Errors: Invalid Credentials
-  - [ ] Refresh token /refresh_token
-    - example: ```localhost/refresh_token&refresh_token=```
+  - [x] Refresh token /refresh_token
+    - example: ```localhost/refresh_token?refresh_token=```
     - response (json): 
      ```
     {
@@ -32,8 +34,8 @@
     }
     ```
     - Possible Errors: Invalid Credentials
-  - [ ] Get user info - Authorization test endpoint
-    - localhost/login&auth_token=
+  - [x] Login - Authorization test endpoint (Get user info)
+    - localhost/login?auth_token=
     - response (json): 
 
     - ```
@@ -42,7 +44,7 @@
         "content": ,
       }
       ```
-    - MVP: Pass token in &access_token, but it should be POST and given in header as bearer
+    - MVP: Access_token should be given in header as bearer token
     - Possible Errors: Invalid Token, Expired token
 - [ ] Mongo DB usage implementation
   - [ ] Database for UserData
